@@ -1,0 +1,11 @@
+export enum Configuration {
+  PORT = 'PORT',
+}
+
+export enum DB_CONFIGURATION {
+  MYSQL_PORT = 'MYSQL_PORT',
+  MYSQL_DB_NAME = 'MYSQL_DB_NAME',
+  MYSQL_USER_PASS = 'MYSQL_USER_PASS',
+  MYSQL_USER = 'MYSQL_USER',
+  MYSQL_HOST = 'MYSQL_HOST',
+}
