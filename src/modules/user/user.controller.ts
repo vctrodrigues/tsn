@@ -21,11 +21,38 @@ import { Role } from '../roles/role.enum';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
-import { UserDTO } from './user.dto';
+import { Post as UserPost } from '../post/post.entity';
+import { PostService } from '../post/post.service';
+
+class UserDTO {
+  name: string;
+  cpf: string;
+  email: string;
+  username: string;
+  bio: string;
+  password: string;
+  role: Role;
+  post: UserPost;
+
+  toUser() {
+    const user = new User();
+    user.cpf = this.cpf;
+    user.name = this.name;
+    user.email = this.email;
+    user.username = this.username;
+    user.bio = this.bio;
+    user.password = this.password;
+    user.role = this.role;
+    return user;
+  }
+}
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly _userService: UserService) {}
+  constructor(
+    private readonly _userService: UserService,
+    private readonly _postService: PostService,
+  ) {}
 
   @UseGuards(JwtAuthGuard)
   @Get(':uuid')
@@ -85,20 +112,18 @@ export class UserController {
     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
   }
 
-  // @UseGuards(JwtAuthGuard)
-  // @Post('/signup')
-  // @Roles(Role.ADMIN)
-  // async signup(@Body() userDTO: UserDTO): Promise<PayloadInterface> {
-  //   const findUser = await this._userService.findByEmail(userDTO.email);
-  //   if (findUser) {
-  //     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
-  //   }
-
-  //   const userCreated = await this._userService.createAndPost(userDTO);
-  //   return createMessage(true, HTTPResponse.CREATED, userCreated);
-
-  //   // criar o post
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Post('/signup')
+  async signup(@Body() userDTO: UserDTO): Promise<PayloadInterface> {
+    const findUser = await this._userService.findByEmail(userDTO.email);
+    if (findUser) {
+      return createMessage(false, HTTPResponse.EMAIL_EXISTS);
+    }
+    const userCreated = await this._userService.create(userDTO.toUser());
+    userDTO.post.user = userCreated;
+    const post = await this._postService.create(userDTO.post);
+    return createMessage(true, HTTPResponse.CREATED, post);
+  }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:uuid')
