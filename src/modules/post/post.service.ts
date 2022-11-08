@@ -1,19 +1,19 @@
 import {
   BadRequestException,
   ForbiddenException,
+  Inject,
   Injectable,
 } from '@nestjs/common';
-import { PostRepository } from './post.repository';
-import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './post.entity';
 import { HTTPResponse } from '../../helpers/responses';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class PostService {
   constructor(
-    @InjectRepository(PostRepository)
-    private readonly _postRepository: PostRepository,
+    @Inject(DB.POST.REPOSITORY)
+    private readonly _postRepository: Repository<Post>,
   ) {}
 
   async findById(id: string): Promise<Post> {

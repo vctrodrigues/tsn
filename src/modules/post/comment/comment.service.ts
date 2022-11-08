@@ -1,17 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { CommentRepository } from './comment.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { HTTPResponse } from '../../../helpers/responses';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { User } from '../../user/user.entity';
 import { Post } from '../post.entity';
 import { Comment } from './comment.entity';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class CommentService {
   constructor(
-    @InjectRepository(CommentRepository)
-    private readonly _commentRepository: CommentRepository,
+    @Inject(DB.COMMENT.REPOSITORY)
+    private readonly _commentRepository: Repository<Comment>,
   ) {}
 
   async create(comment: Comment): Promise<Comment> {

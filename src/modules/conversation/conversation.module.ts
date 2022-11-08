@@ -1,18 +1,19 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConversationRepository } from './conversation.repository';
 import { ConversationService } from './conversation.service';
 import { ConversationController } from './conversation.controller';
 import { MessageService } from './message/message.service';
-import { MessageRepository } from './message/message.repository';
 import { SharedModule } from '../../shared/shared.module';
+import { DatabaseModule } from 'src/database/database.module';
+import { conversationProviders } from './conversation.providers';
+import { messageProviders } from './message/message.providers';
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([ConversationRepository]),
-    TypeOrmModule.forFeature([MessageRepository]),
-    SharedModule,
+  imports: [SharedModule, DatabaseModule],
+  providers: [
+    ConversationService,
+    MessageService,
+    ...conversationProviders,
+    ...messageProviders,
   ],
-  providers: [ConversationService, MessageService],
   controllers: [ConversationController],
   exports: [ConversationService, MessageService],
 })

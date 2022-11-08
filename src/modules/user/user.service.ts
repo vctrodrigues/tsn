@@ -1,16 +1,16 @@
 import { HTTPResponse } from './../../helpers/responses';
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository)
-    private readonly _userRepository: UserRepository,
+    @Inject(DB.USER.REPOSITORY)
+    private readonly _userRepository: Repository<User>,
   ) {}
 
   async findById(id: string): Promise<User> {

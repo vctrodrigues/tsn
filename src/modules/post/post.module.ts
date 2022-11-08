@@ -1,21 +1,23 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
-import { PostRepository } from './post.repository';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
-import { LikeRepository } from './like/like.repository';
 import { LikeService } from './like/like.service';
-import { CommentRepository } from './comment/comment.repository';
 import { CommentService } from './comment/comment.service';
 import { SharedModule } from '../../shared/shared.module';
+import { postProviders } from './post.providers';
+import { DatabaseModule } from 'src/database/database.module';
+import { commentProviders } from './comment/comment.providers';
+import { likeProviders } from './like/like.providers';
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([PostRepository]),
-    TypeOrmModule.forFeature([LikeRepository]),
-    TypeOrmModule.forFeature([CommentRepository]),
-    SharedModule,
+  imports: [SharedModule, DatabaseModule],
+  providers: [
+    ...postProviders,
+    ...likeProviders,
+    ...commentProviders,
+    PostService,
+    LikeService,
+    CommentService,
   ],
-  providers: [PostService, LikeService, CommentService],
   controllers: [PostController],
   exports: [PostService, LikeService, CommentService],
 })

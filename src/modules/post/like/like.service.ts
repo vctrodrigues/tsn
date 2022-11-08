@@ -1,17 +1,16 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { HTTPResponse } from '../../../helpers/responses';
 import { User } from '../../user/user.entity';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { Post } from '../post.entity';
 import { Like } from './like.entity';
-import { LikeRepository } from './like.repository';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class LikeService {
   constructor(
-    @InjectRepository(LikeRepository)
-    private readonly _likeRepository: LikeRepository,
+    @Inject(DB.LIKE.REPOSITORY)
+    private readonly _likeRepository: Repository<Like>,
   ) {}
 
   async create(like: Like): Promise<Like> {

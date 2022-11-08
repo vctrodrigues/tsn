@@ -11,13 +11,14 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Patch,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { User } from './user.entity';
 import { HTTPResponse } from '../../helpers/responses';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Roles } from '../roles/roles.decorator';
-import { Role } from '../roles/role.enum';
+// import { Roles } from '../roles/roles.decorator';
+// import { Role } from '../roles/role.enum';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
@@ -72,9 +73,9 @@ export class UserController {
     return await this._userService.getAll();
   }
 
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post()
-  @Roles(Role.ADMIN)
+  // @Roles(Role.ADMIN)
   async createUser(@Body() user: User): Promise<PayloadInterface> {
     const findUser = await this._userService.findByEmail(user.email);
     if (!findUser) {
@@ -108,7 +109,7 @@ export class UserController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/update')
+  @Patch('/update')
   async updateUser(@Request() req, @Body() user: User) {
     return this._userService.update(user, req.user.id);
   }

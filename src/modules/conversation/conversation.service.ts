@@ -1,15 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConversationRepository } from './conversation.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Conversation } from './conversation.entity';
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { HTTPResponse } from '../../helpers/responses';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class ConversationService {
   constructor(
-    @InjectRepository(ConversationRepository)
-    private readonly _conversationRepository: ConversationRepository,
+    @Inject(DB.CONVERSATION.REPOSITORY)
+    private readonly _conversationRepository: Repository<Conversation>,
   ) {}
 
   async findById(id: string, user_id: string): Promise<Conversation> {
