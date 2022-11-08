@@ -16,7 +16,7 @@ services:
 
   tsn-phpmyadmin:
     container_name: tsn-phpmyadmin
-    image: phpmyadmin/phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin:5.1.4
     links:
       - db:${MYSQL_HOST}
     depends_on:
@@ -48,7 +48,7 @@ services:
       - /app/node_modules/
     expose:
       - '${PORT}'
-    command: /bin/sh -c "npm run start:dev"
+    command: /bin/sh -c "npm run start:docker"
     env_file: .env
 
 volumes:
