@@ -23,7 +23,7 @@ export class CommentService {
   }
 
   async delete(id: string): Promise<DeleteResult> {
-    if (!(await this._commentRepository.findOne(id))) {
+    if (!(await this._commentRepository.findOne({ where: { id } }))) {
       throw new BadRequestException(HTTPResponse.NOT_FOUND);
     }
 

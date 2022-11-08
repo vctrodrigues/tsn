@@ -21,6 +21,7 @@ import { Role } from '../roles/role.enum';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
+import { UserDTO } from './user.dto';
 
 @Controller('users')
 export class UserController {
@@ -83,6 +84,21 @@ export class UserController {
 
     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
   }
+
+  // @UseGuards(JwtAuthGuard)
+  // @Post('/signup')
+  // @Roles(Role.ADMIN)
+  // async signup(@Body() userDTO: UserDTO): Promise<PayloadInterface> {
+  //   const findUser = await this._userService.findByEmail(userDTO.email);
+  //   if (findUser) {
+  //     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
+  //   }
+
+  //   const userCreated = await this._userService.createAndPost(userDTO);
+  //   return createMessage(true, HTTPResponse.CREATED, userCreated);
+
+  //   // criar o post
+  // }
 
   @UseGuards(JwtAuthGuard)
   @Delete('/:uuid')
