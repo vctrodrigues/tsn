@@ -1,16 +1,16 @@
 import { HTTPResponse } from './../../helpers/responses';
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { UserRepository } from './user.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable, BadRequestException, Inject } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 
 import { User } from './user.entity';
+import { Repository } from 'typeorm';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectRepository(UserRepository)
-    private readonly _userRepository: UserRepository,
+    @Inject(DB.USER.REPOSITORY)
+    private readonly _userRepository: Repository<User>,
   ) {}
 
   async findById(id: string): Promise<User> {
@@ -55,7 +55,9 @@ export class UserService {
   }
 
   async delete(uuid: string): Promise<void> {
-    const userExists = await this._userRepository.findOne(uuid);
+    const userExists = await this._userRepository.findOne({
+      where: { id: uuid },
+    });
 
     if (!userExists) {
       throw new BadRequestException(HTTPResponse.NOT_FOUND);
@@ -68,7 +70,7 @@ export class UserService {
   async update(user: User, uuid?: string): Promise<User> {
     try {
       if (this._userRepository.update(uuid || user.id, user)) {
-        return this._userRepository.findOne(uuid || user.id);
+        return this._userRepository.findOne({ where: { id: uuid || user.id } });
       }
     } catch (exception) {
       throw exception;

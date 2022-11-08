@@ -48,7 +48,7 @@ services:
       - /app/node_modules/
     expose:
       - '${PORT}'
-    command: /bin/sh -c "npm run start:docker"
+    command: /bin/sh -c "npm run start:dev"
     env_file: .env
 
 volumes:

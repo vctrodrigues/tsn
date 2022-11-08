@@ -1,14 +1,15 @@
-import { DB_CONFIGURATION } from './../config/config.key';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { DB_CONFIGURATION } from '../config/config.key';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ConnectionOptions } from 'typeorm';
+import { DataSource } from 'typeorm';
+import { DB } from 'src/helpers/constants';
 
 export const databaseProviders = [
-  TypeOrmModule.forRootAsync({
+  {
+    provide: DB.DATA_SOURCE,
     imports: [ConfigModule],
     inject: [ConfigService],
     async useFactory(configService: ConfigService) {
-      return {
+      const dataSource = new DataSource({
         type: 'mysql' as const,
         host: configService.get<string>(DB_CONFIGURATION.MYSQL_HOST),
         username: configService.get<string>(DB_CONFIGURATION.MYSQL_USER),
@@ -18,8 +19,9 @@ export const databaseProviders = [
 
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
-        keepConnectionAlive: true,
-      } as ConnectionOptions;
+      });
+
+      return dataSource.initialize();
     },
-  }),
+  },
 ];

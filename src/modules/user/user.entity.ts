@@ -41,10 +41,10 @@ export class User extends BaseEntity {
   picture: string;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ type: 'varchar', nullable: false, length: 100 })
+  @Column({ type: 'varchar', nullable: false, length: 255 })
   password: string;
 
-  @Column({ type: 'varchar', nullable: true, length: 14 })
+  @Column({ type: 'varchar', default: Role.USER, nullable: true, length: 14 })
   role: Role;
 
   @OneToMany(() => Message, (message) => message.fromUser)

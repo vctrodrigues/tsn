@@ -1,15 +1,14 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { ConversationRepository } from './conversation.repository';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Conversation } from './conversation.entity';
-import { DeleteResult, UpdateResult } from 'typeorm';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { HTTPResponse } from '../../helpers/responses';
+import { DB } from 'src/helpers/constants';
 
 @Injectable()
 export class ConversationService {
   constructor(
-    @InjectRepository(ConversationRepository)
-    private readonly _conversationRepository: ConversationRepository,
+    @Inject(DB.CONVERSATION.REPOSITORY)
+    private readonly _conversationRepository: Repository<Conversation>,
   ) {}
 
   async findById(id: string, user_id: string): Promise<Conversation> {
@@ -45,8 +44,8 @@ export class ConversationService {
   async findByUserActive(user_id: string): Promise<Conversation[]> {
     return await this._conversationRepository
       .createQueryBuilder('conversation')
-      .where({ fromUser: user_id, active: true })
-      .orWhere({ toUser: user_id, active: true })
+      .where({ fromUser: { id: user_id }, active: true })
+      .orWhere({ toUser: { Id: user_id }, active: true })
       .getMany();
   }
 
@@ -73,8 +72,8 @@ export class ConversationService {
     if (
       !(await this._conversationRepository.findOne({
         where: [
-          { id, fromUser: user_id },
-          { id, toUser: user_id },
+          { id, fromUser: { id: user_id } },
+          { id, toUser: { id: user_id } },
         ],
       }))
     ) {
