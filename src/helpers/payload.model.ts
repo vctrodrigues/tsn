@@ -4,15 +4,22 @@ export interface PayloadInterface {
   message?: string;
 }
 
+export interface Validation {
+  validated: boolean;
+  field?: string;
+}
+
 const createMessage = (
   success: boolean,
   message?: string,
   payload?: any[] | any,
+  field?: string,
 ) => {
   return {
     payload,
     success,
     message,
+    field,
   };
 };
 

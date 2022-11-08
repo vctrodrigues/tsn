@@ -1,4 +1,7 @@
-import createMessage, { PayloadInterface } from './../../helpers/payload.model';
+import createMessage, {
+  PayloadInterface,
+  Validation,
+} from './../../helpers/payload.model';
 import {
   Controller,
   Request,
@@ -124,6 +127,11 @@ export class UserController {
       return createMessage(true, HTTPResponse.CREATED, userCreated);
     }
 
+    const { validated, field } = this._validate(user);
+    if (!validated) {
+      return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
+    }
+
     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
   }
 
@@ -134,6 +142,11 @@ export class UserController {
 
     if (findUser) {
       return createMessage(false, HTTPResponse.EMAIL_EXISTS);
+    }
+
+    const { validated, field } = this._validate(userDTO);
+    if (!validated) {
+      return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
     }
 
     const userCreated = await this._userService.create(userDTO.toUser());
@@ -153,6 +166,11 @@ export class UserController {
   @UseGuards(JwtAuthGuard)
   @Patch('/update')
   async updateUser(@Request() req, @Body() user: User) {
+    const { validated, field } = this._validate(user);
+    if (!validated) {
+      return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
+    }
+
     return this._userService.update(user, req.user.id);
   }
 
@@ -172,5 +190,22 @@ export class UserController {
     user.picture = file.filename;
 
     return this._userService.update(user, req.user.id);
+  }
+
+  _validate(user: User | UserDTO): Validation {
+    const fields = ['email', 'password', 'cpf', 'name', 'username'];
+
+    for (const field of fields) {
+      if (!user[field]) {
+        return {
+          validated: false,
+          field,
+        };
+      }
+    }
+
+    return {
+      validated: true,
+    };
   }
 }

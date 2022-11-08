@@ -1,4 +1,7 @@
-import createMessage, { PayloadInterface } from '../../helpers/payload.model';
+import createMessage, {
+  PayloadInterface,
+  Validation,
+} from '../../helpers/payload.model';
 import {
   Controller,
   Request,
@@ -13,6 +16,7 @@ import {
   UseGuards,
   NotFoundException,
   Res,
+  Patch,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { Post as PostEntity } from './post.entity';
@@ -121,6 +125,12 @@ export class PostController {
   ): Promise<PayloadInterface> {
     try {
       post.user = req.user.id;
+
+      const { validated, field } = this._validate(post);
+      if (!validated) {
+        return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
+      }
+
       const createdPost = await this._postService.create(post);
 
       return createdPost
@@ -156,7 +166,7 @@ export class PostController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Post('/:uuid')
+  @Patch('/:uuid')
   async updatePost(
     @Request() req,
     @Param('uuid', ParseUUIDPipe) uuid: string,
@@ -195,6 +205,11 @@ export class PostController {
     @Body() postDTO,
   ): Promise<PayloadInterface> {
     postDTO = new PostDTO(postDTO);
+
+    const { validated, field } = this._validate(postDTO);
+    if (!validated) {
+      return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
+    }
 
     if (postDTO.like) {
       const like = new Like();
@@ -280,6 +295,11 @@ export class PostController {
     comment.post.id = uuid;
     comment.user = req.user.id;
 
+    const { validated, field } = this._validateComment(comment);
+    if (!validated) {
+      return createMessage(false, HTTPResponse.BAD_REQUEST, null, field);
+    }
+
     try {
       if (await this._commentService.create(comment)) {
         const post = await this._postService.findById(uuid);
@@ -310,5 +330,39 @@ export class PostController {
   @Get('/image/:filename')
   async getImage(@Param('filename') media: string, @Res() res) {
     res.sendFile(media, { root: 'uploads' });
+  }
+
+  _validate(post: PostEntity | PostDTO): Validation {
+    const fields = ['text'];
+
+    for (const field of fields) {
+      if (!post[field]) {
+        return {
+          validated: false,
+          field,
+        };
+      }
+    }
+
+    return {
+      validated: true,
+    };
+  }
+
+  _validateComment(comment: Comment): Validation {
+    const fields = ['text'];
+
+    for (const field of fields) {
+      if (!comment[field]) {
+        return {
+          validated: false,
+          field,
+        };
+      }
+    }
+
+    return {
+      validated: true,
+    };
   }
 }
