@@ -27,6 +27,24 @@ import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
 import { User } from '../user/user.entity';
 
+class PostDTO {
+  text: string;
+  like: boolean;
+
+  constructor({ text, like }) {
+    this.text = text;
+    this.like = like;
+  }
+
+  toPost() {
+    const post = new PostEntity();
+
+    post.text = this.text;
+
+    return post;
+  }
+}
+
 @Controller('posts')
 export class PostController {
   constructor(
@@ -167,6 +185,47 @@ export class PostController {
     } catch (exception) {
       return createMessage(false, exception);
     }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('/:uuid/react')
+  async reactPost(
+    @Request() req,
+    @Param('uuid', ParseUUIDPipe) uuid: string,
+    @Body() postDTO,
+  ): Promise<PayloadInterface> {
+    postDTO = new PostDTO(postDTO);
+
+    if (postDTO.like) {
+      const like = new Like();
+      like.post = new PostEntity();
+      like.post.id = uuid;
+      like.user = new User();
+      like.user = req.user.id;
+
+      try {
+        if (await this._likeService.create(like)) {
+          const post = await this._postService.findById(uuid);
+          return createMessage(true, HTTPResponse.CREATED, post);
+        }
+      } catch (exception) {
+        return createMessage(false, HTTPResponse.UNKNOWN_ERROR);
+      }
+    } else {
+      const post = await this._postService.findById(uuid);
+      const like = await this._likeService.find(req.user, post);
+
+      try {
+        if (like && (await this._likeService.delete(like.id))) {
+          const updatedPost = await this._postService.findById(uuid);
+          return createMessage(true, HTTPResponse.DELETED, updatedPost);
+        }
+      } catch (exception) {
+        return createMessage(false, HTTPResponse.NOT_FOUND);
+      }
+    }
+
+    return createMessage(false, HTTPResponse.NOT_FOUND);
   }
 
   @UseGuards(JwtAuthGuard)

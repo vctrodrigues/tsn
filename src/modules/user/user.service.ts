@@ -63,7 +63,6 @@ export class UserService {
       throw new BadRequestException(HTTPResponse.NOT_FOUND);
     }
 
-    // need to add check permissions for deleting user
     await this._userRepository.delete(uuid);
   }
 
@@ -76,8 +75,4 @@ export class UserService {
       throw exception;
     }
   }
-
-  // async createAndPost() {
-
-  // }
 }

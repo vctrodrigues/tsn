@@ -41,7 +41,7 @@ export class User extends BaseEntity {
   picture: string;
 
   @Exclude({ toPlainOnly: true })
-  @Column({ type: 'varchar', nullable: false, length: 255 })
+  @Column({ type: 'longtext', nullable: false })
   password: string;
 
   @Column({ type: 'varchar', default: Role.USER, nullable: true, length: 14 })

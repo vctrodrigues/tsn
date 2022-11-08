@@ -17,8 +17,8 @@ import { UserService } from './user.service';
 import { User } from './user.entity';
 import { HTTPResponse } from '../../helpers/responses';
 import { FileInterceptor } from '@nestjs/platform-express';
-// import { Roles } from '../roles/roles.decorator';
-// import { Role } from '../roles/role.enum';
+import { Roles } from '../roles/roles.decorator';
+import { Role } from '../roles/role.enum';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
@@ -26,6 +26,20 @@ import { Post as UserPost } from '../post/post.entity';
 import { PostService } from '../post/post.service';
 
 class UserDTO {
+  constructor(user) {
+    const { name, cpf, email, username, bio, password, role, post } = user;
+
+    this.name = name;
+    this.cpf = cpf;
+    this.email = email;
+    this.username = username;
+    this.bio = bio;
+    this.password = password;
+    this.role = role;
+    this.post = new UserPost();
+    this.post.text = post;
+  }
+
   name: string;
   cpf: string;
   email: string;
@@ -100,9 +114,9 @@ export class UserController {
     return await this._userService.getAll();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  // @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createUser(@Body() user: User): Promise<PayloadInterface> {
     const findUser = await this._userService.findByEmail(user.email);
     if (!findUser) {
@@ -113,15 +127,18 @@ export class UserController {
     return createMessage(false, HTTPResponse.EMAIL_EXISTS);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('/signup')
-  async signup(@Body() userDTO: UserDTO): Promise<PayloadInterface> {
+  async signup(@Body() userDTO): Promise<PayloadInterface> {
+    userDTO = new UserDTO(userDTO);
     const findUser = await this._userService.findByEmail(userDTO.email);
+
     if (findUser) {
       return createMessage(false, HTTPResponse.EMAIL_EXISTS);
     }
+
     const userCreated = await this._userService.create(userDTO.toUser());
     userDTO.post.user = userCreated;
+
     const post = await this._postService.create(userDTO.post);
     return createMessage(true, HTTPResponse.CREATED, post);
   }
