@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   db:
+    platform: linux/x86_64
     image: mysql:5.7
     container_name: ${MYSQL_HOST}
     volumes:
@@ -13,8 +14,8 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
 
-  psag-phpmyadmin:
-    container_name: psag-phpmyadmin
+  tsn-phpmyadmin:
+    container_name: tsn-phpmyadmin
     image: phpmyadmin/phpmyadmin:latest
     links:
       - db:${MYSQL_HOST}
@@ -27,8 +28,8 @@ services:
       PMA_HOST: ${MYSQL_HOST}
       PMA_PORT: ${MYSQL_PORT}
 
-  psag-server:
-    container_name: psag-server
+  tsn:
+    container_name: tsn
     environment:
       - NODE_ENV=dev
     build:
