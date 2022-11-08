@@ -16,6 +16,7 @@ import { Comment } from '../post/comment/comment.entity';
 import { Like } from '../post/like/like.entity';
 import { Conversation } from '../conversation/conversation.entity';
 import { Message } from '../conversation/message/message.entity';
+import { Roles } from '../roles/roles.decorator';
 
 @Entity('user')
 export class User extends BaseEntity {
@@ -44,7 +45,7 @@ export class User extends BaseEntity {
   @Column({ type: 'varchar', nullable: false, length: 100 })
   password: string;
 
-  @Column({ type: 'varchar', nullable: true, length: 14 })
+  @Column({ type: 'varchar', default: Role.USER, nullable: true, length: 14 })
   role: Role;
 
   @OneToMany(() => Message, (message) => message.fromUser)

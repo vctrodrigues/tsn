@@ -55,7 +55,9 @@ export class UserService {
   }
 
   async delete(uuid: string): Promise<void> {
-    const userExists = await this._userRepository.findOne(uuid);
+    const userExists = await this._userRepository.findOne({
+      where: { id: uuid },
+    });
 
     if (!userExists) {
       throw new BadRequestException(HTTPResponse.NOT_FOUND);
@@ -68,7 +70,7 @@ export class UserService {
   async update(user: User, uuid?: string): Promise<User> {
     try {
       if (this._userRepository.update(uuid || user.id, user)) {
-        return this._userRepository.findOne(uuid || user.id);
+        return this._userRepository.findOne({ where: { id: uuid || user.id } });
       }
     } catch (exception) {
       throw exception;

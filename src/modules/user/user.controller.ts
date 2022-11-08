@@ -21,7 +21,7 @@ import { Role } from '../roles/role.enum';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
-import { UserDTO } from './user.dto';
+// import { UserDTO } from './user.dto';
 
 @Controller('users')
 export class UserController {

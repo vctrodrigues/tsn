@@ -45,8 +45,8 @@ export class ConversationService {
   async findByUserActive(user_id: string): Promise<Conversation[]> {
     return await this._conversationRepository
       .createQueryBuilder('conversation')
-      .where({ fromUser: user_id, active: true })
-      .orWhere({ toUser: user_id, active: true })
+      .where({ fromUser: { id: user_id }, active: true })
+      .orWhere({ toUser: { Id: user_id }, active: true })
       .getMany();
   }
 
@@ -73,8 +73,8 @@ export class ConversationService {
     if (
       !(await this._conversationRepository.findOne({
         where: [
-          { id, fromUser: user_id },
-          { id, toUser: user_id },
+          { id, fromUser: { id: user_id } },
+          { id, toUser: { id: user_id } },
         ],
       }))
     ) {

@@ -23,7 +23,7 @@ export class LikeService {
   }
 
   async delete(id: string): Promise<DeleteResult> {
-    if (!(await this._likeRepository.findOne(id))) {
+    if (!(await this._likeRepository.findOne({ where: { id } }))) {
       throw new BadRequestException(HTTPResponse.NOT_FOUND);
     }
 
@@ -31,6 +31,8 @@ export class LikeService {
   }
 
   async find(user: User, post: Post): Promise<Like> {
-    return await this._likeRepository.findOne({ where: { user, post } });
+    return await this._likeRepository.findOne({
+      where: { user: { id: user.id }, post: { id: post.id } },
+    });
   }
 }
