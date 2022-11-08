@@ -71,9 +71,9 @@ export class UserController {
     return await this._userService.getAll();
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
-  // @Roles(Role.ADMIN)
+  @Roles(Role.ADMIN)
   async createUser(@Body() user: User): Promise<PayloadInterface> {
     const findUser = await this._userService.findByEmail(user.email);
     if (!findUser) {
