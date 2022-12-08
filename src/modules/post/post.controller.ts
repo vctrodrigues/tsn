@@ -320,6 +320,10 @@ export class PostController {
     @Param('post_id', ParseUUIDPipe) post_id: string,
     @Param('comment_id', ParseUUIDPipe) comment_id: string,
   ): Promise<PayloadInterface> {
+    if (process.env.NODE_ENV === 'production') {
+      throw new NotFoundException();
+    }
+
     const post = await this._postService.findById(post_id);
     const comment = await this._commentService.find(req.user, post, comment_id);
 
