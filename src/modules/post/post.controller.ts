@@ -30,6 +30,7 @@ import { Comment } from './comment/comment.entity';
 import { diskStorage } from 'multer';
 import fileUtils from '../../helpers/file';
 import { User } from '../user/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 class PostDTO {
   text: string;
@@ -55,6 +56,7 @@ export class PostController {
     private readonly _postService: PostService,
     private readonly _likeService: LikeService,
     private readonly _commentService: CommentService,
+    private readonly _configService: ConfigService,
   ) {}
 
   @UseGuards(JwtAuthGuard)
@@ -320,7 +322,7 @@ export class PostController {
     @Param('post_id', ParseUUIDPipe) post_id: string,
     @Param('comment_id', ParseUUIDPipe) comment_id: string,
   ): Promise<PayloadInterface> {
-    if (process.env.NODE_ENV === 'production') {
+    if (this._configService.get('NODE_ENV') === 'Production') {
       throw new NotFoundException();
     }
 

@@ -1,12 +1,12 @@
 version: '3.7'
 
 services:
-  db:
+  tsn_db_prod:
     platform: linux/x86_64
     image: mysql:5.7
     container_name: ${MYSQL_HOST}
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data_prod:/var/lib/mysql
     ports:
       - '${MYSQL_PORT}:${MYSQL_PORT}'
     environment:
@@ -14,13 +14,13 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB_NAME}
 
-  tsn-phpmyadmin:
-    container_name: tsn-phpmyadmin
+  tsn_phpmyadmin_prod:
+    container_name: tsn_phpmyadmin_prod
     image: phpmyadmin/phpmyadmin:5.1.4
     links:
-      - db:${MYSQL_HOST}
+      - tsn_db_prod:${MYSQL_HOST}
     depends_on:
-      - db
+      - tsn_db_prod
     ports:
       - '8080:80'
     environment:
@@ -28,19 +28,19 @@ services:
       PMA_HOST: ${MYSQL_HOST}
       PMA_PORT: ${MYSQL_PORT}
 
-  tsn:
-    container_name: tsn
+  tsn_prod:
+    container_name: tsn_prod
     environment:
-      - NODE_ENV=Development
+      - NODE_ENV=Production
     build:
       context: .
       dockerfile: Dockerfile
     working_dir: /app
     restart: always
     links:
-      - db:${MYSQL_HOST}
+      - tsn_db_prod:${MYSQL_HOST}
     depends_on:
-      - db
+      - tsn_db_prod
     ports:
       - '${PORT}:${PORT}'
     volumes:
@@ -48,9 +48,8 @@ services:
       - /app/node_modules/
     expose:
       - '${PORT}'
-    command: /bin/sh -c "npm install && npm run start:dev"
-    env_file:
-      - .env.development
+    command: /bin/sh -c "npm install && npm build && npm run start:prod"
+    env_file: .env
 
 volumes:
-  db_data: {}
+  db_data_prod: {}

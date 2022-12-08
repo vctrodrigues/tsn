@@ -8,6 +8,7 @@ import { postProviders } from './post.providers';
 import { DatabaseModule } from 'src/database/database.module';
 import { commentProviders } from './comment/comment.providers';
 import { likeProviders } from './like/like.providers';
+import { ConfigService } from '@nestjs/config';
 @Module({
   imports: [SharedModule, DatabaseModule],
   providers: [
@@ -17,8 +18,9 @@ import { likeProviders } from './like/like.providers';
     PostService,
     LikeService,
     CommentService,
+    ConfigService,
   ],
   controllers: [PostController],
-  exports: [PostService, LikeService, CommentService],
+  exports: [PostService, LikeService, CommentService, ConfigService],
 })
 export class PostModule {}

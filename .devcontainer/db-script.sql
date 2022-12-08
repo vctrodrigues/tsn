@@ -6,7 +6,7 @@ CREATE TABLE user (
   username VARCHAR(50) NOT NULL,
   bio VARCHAR(250),
   picture VARCHAR(150),
-  `password` VARCHAR(30) NOT NULL,
+  `password` TEXT NOT NULL,
   `role` VARCHAR(14) NOT NULL DEFAULT 'user',
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NULL,
