@@ -152,8 +152,12 @@ export class UserController {
     const userCreated = await this._userService.create(userDTO.toUser());
     userDTO.post.user = userCreated;
 
-    const post = await this._postService.create(userDTO.post);
-    return createMessage(true, HTTPResponse.CREATED, post);
+    if (userDTO.post.text) {
+      const post = await this._postService.create(userDTO.post);
+      return createMessage(true, HTTPResponse.CREATED, post);
+    } else {
+      return createMessage(true, HTTPResponse.CREATED, userCreated);
+    }
   }
 
   @UseGuards(JwtAuthGuard)

@@ -12,6 +12,7 @@ export class AuthService {
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -31,6 +32,7 @@ export class AuthService {
   async login(user: any) {
     const payload = {
       email: user.email,
+      password: user.password,
       sub: user.id,
     };
     const access_token = this.jwtService.sign(payload);

@@ -85,8 +85,11 @@ export class PostController {
 
   @UseGuards(JwtAuthGuard)
   @Get('/feed')
-  async getUserPosts(@Request() req): Promise<PayloadInterface> {
-    const posts = await this._postService.findByUser(req.user.id);
+  async getUserFeed(@Request() req): Promise<PayloadInterface> {
+    const posts = await this._postService
+      .getAll()
+      .then((posts) => posts.filter((post) => post.user.id !== req.user.id));
+
     if (posts && posts.length > 0) {
       return createMessage(true, '', posts);
     }
